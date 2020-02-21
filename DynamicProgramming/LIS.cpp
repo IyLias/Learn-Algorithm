@@ -30,11 +30,11 @@ int main(){
     max_list[i] = tem + 1;
  }
 
- cout << max_list[N-1] << endl;
-
+ int max_value=0;
  for(int i=0;i<N;i++)
-    cout << max_list[i] << " ";
- cout << endl;
+   if(max_value < max_list[i])
+	max_value = max_list[i];
+ cout << max_value << endl;
 
  return 0;
 }
