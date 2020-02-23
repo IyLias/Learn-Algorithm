@@ -39,6 +39,9 @@ int main(){
  scanf("%d %d",&N,&M);
 
  int inDegree[MAXNUM+1];
+ for(int i=1;i<=N;i++)
+    inDegree[i] = 0;
+
  int p1,p2;
  for(int i=0;i<M;i++){
     scanf("%d %d",&p1,&p2);
