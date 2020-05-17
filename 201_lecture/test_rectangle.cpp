@@ -98,7 +98,7 @@ int main(){
  initialize(n);
 
  // ******************************* MINIMUM PART *********************************
- for(int i=1;i<n;i++)
+ for(int i=1;i<=n;i++)
    for(int j=1;j<=n;j++){
       target_rectangle[i][j] *= -1;  
       cumulative_sum[i][j] *= -1;
@@ -117,12 +117,12 @@ int main(){
    }
  
  printf("result: %.1lf\n",-maxRectangle.maxsum);
- printf("max value pos: (%d,%d)(%d,%d)\n",maxRectangle.top_left.row,maxRectangle.top_left.column
+ printf("min value pos: (%d,%d)(%d,%d)\n",maxRectangle.top_left.row,maxRectangle.top_left.column
 		        ,maxRectangle.bottom_right.row,maxRectangle.bottom_right.column);
 
  // ******************************** MAXIMUM PART ************************************
 
- for(int i=1;i<n;i++)
+ for(int i=1;i<=n;i++)
    for(int j=1;j<=n;j++){
       target_rectangle[i][j] *= -1;  
       cumulative_sum[i][j] *= -1;
