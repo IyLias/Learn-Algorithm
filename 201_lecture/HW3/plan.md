@@ -17,6 +17,16 @@ plan for HW3 in Algorithm 201 lecture
 
 ## Move Pattern of Minotaur
 
+***each move checks*** 
+
+- whether that move makes get close to me
+ 
+- whether possible to make that move
+
+If following 2 conditions hold, then Minotaur can make that move
+
+
+Here's simple move logic of Minotaur
   
 1) If moving horizontally makes get close to me, then move horizontally
 
