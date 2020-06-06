@@ -11,8 +11,13 @@ plan for HW3 in Algorithm 201 lecture
 
   Minotaur doesn't choose moving horizontally?
 
-  
 
+- I constructed class Puzzle to store Map informations, move methods and so on.
+
+  But how to input huge Map datas in preprocess?  
+
+
+- how to make backtracking of my moves not to dive in infinite loop?
 
 
 ## Move Pattern of Minotaur
