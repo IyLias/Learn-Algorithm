@@ -16,6 +16,14 @@ plan for HW3 in Algorithm 201 lecture
 
   But how to input huge Map datas in preprocess?  
 
+  ***possible solution***
+  
+  - symbolize one number to represent position state
+
+    ex) 1011 = 11 => only right open , 1010 = 10 => right,bottom open
+
+    Use bitmap operation to find specific position is open ( and(&) operation )
+
 
 - how to make backtracking of my moves not to dive in infinite loop?
 
