@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 
 #define MAXNUM	20
@@ -31,9 +32,11 @@ class Puzzle{
     // ex) 11 means 1011 => only right is open 
     int puzzleMap[MAXNUM][MAXNUM];
 
+    const int totalDirection[5][2]={{0,-1},{0,1},{-1,0},{1,0},{0,0}};
     const int horizon[2][2]={{0,-1},{0,1}};
     const int vertical[2][2] = {{-1,0},{1,0}};
 
+    const char dir[5] = {'L','R','U','D','S'};
     char solution[MAX_SOLUTION_LENGTH];
 
     // start position of 2 characters
@@ -82,6 +85,13 @@ class Puzzle{
 	     puzzleMap[i][j] = mapInfo[i-1][j-1];
     }
 
+    void printSolution(){
+	for(int i=0;solution[i];i++){
+	   printf("%c",solution[i]);
+	   if(i%10 == 0) printf("\n");
+	}
+	printf("\n");
+    }
 
     int distance(int r1,int c1,int r2,int c2){
        return (r1-r2)*(r1-r2) + (c1-c2)*(c1-c2);
@@ -111,7 +121,7 @@ class Puzzle{
           // 1) first check left and right direction
 	  for(int j=0;j<2;j++)
 	  // left direction => not blocked by wall? and this move get close to me?
-	    if(!(puzzleMap[minotaur_row+horizon[j][0]][minotaur_col+horizon[j][1]] & (1<<(4-j))) && 
+	    if(!(puzzleMap[minotaur_row][minotaur_col] & (1<<(3-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+horizon[j][0],minotaur_col+horizon[j][1]))){
 	      isMoved = true;	
 	      minotaur_row += horizon[j][0],minotaur_col += horizon[j][1];
@@ -120,7 +130,7 @@ class Puzzle{
 	  // 2) second check top and bottom direction	
 	  for(int j=0;j<2;j++)
 	     // left direction => not blocked by wall? and this move get close to me?
-	     if(!(puzzleMap[minotaur_row+vertical[j][0]][minotaur_col+vertical[j][1]] & (1<<(2-j))) && 
+	     if(!(puzzleMap[minotaur_row][minotaur_col] & (1<<(1-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+vertical[j][0],minotaur_col+vertical[j][1]))){
 	       isMoved = true;	
 	       minotaur_row += vertical[j][0],minotaur_col += vertical[j][1];
@@ -131,6 +141,8 @@ class Puzzle{
 	     break;
        }
 
+
+	printf("minotaur pos after move: %d %d\n",minotaur_row,minotaur_col);
     }
 
     // My move
@@ -157,17 +169,24 @@ class Puzzle{
 
     // solve puzzle function
     // print solution of corresponding puzzle map
-    void solvePuzzle(int moveTimes){
+    void solvePuzzle(int moveTimes,int direction){
 
-      myMove();
-
+      myMove(direction);
       minotaurMove();
-
-      if(isGameClear() == true) return;
+      
+      if(isGameClear() == true){
+	solution[moveTimes] = dir[direction];
+        return;	      
+      } 
 
       if(isGameOver() == false){
-	solution[moveTimes] = ;
-        solvePuzzle(moveTimes+1);
+	solution[moveTimes] = dir[direction];
+        
+        for(int i=0;i<5;i++){
+	  int randomDir = rand()%5;
+       	  if(!(puzzleMap[my_row][my_col] & (randomDir!=4 ? (1 << (3-randomDir)) : 0))) 
+	    solvePuzzle(moveTimes+1,randomDir);
+	}
       }
 
     }
@@ -179,6 +198,8 @@ class Puzzle{
 
 int main(){
   
+  srand((unsigned int)time(NULL));
+
 // ------------------------------------- puzzle 1 -------------------------------------------
 
   // mapInfo order: left right top bottom
@@ -200,7 +221,7 @@ int main(){
      puzzle1_mapInfo[i] = puzzle1_mapData[i];
   }
 
-  Puzzle minotaurPuzzle1(8,9,9,2,puzzle1_mapInfo);
+  Puzzle minotaurPuzzle1(8,9,1,1,3,3,9,2,puzzle1_mapInfo);
 
   for(int i=1;i<9;i++){
     for(int j=1;j<10;j++)
@@ -208,26 +229,47 @@ int main(){
     printf("\n");
   }
 
+  printf("1<<0 ? : %d\n",1<<0);
+
   printf("Puzzle1\n");
   // print solution of puzzle1
-
-
+  minotaurPuzzle1.solvePuzzle(0,RIGHT);
+  minotaurPuzzle1.printSolution();
 
 
 
 // ------------------------------------ puzzle 2 --------------------------------------
 
   // puzzle2 size: 8x9
-  const int puzzle2_mapInfo[8][9]={
-//     {},{},{},{},{},{},{},{},{},
-//     {},{},{},{},{},{},{},{},{},
-//     {},{},{},{},{},{},{},{},{},
-//     {},{},{},{},{},{},{},{},{},
-//     {},{},{},{},{},{},{},{},{},
-//     {},{},{},{},{},{},{},{},{},
-//     {},{},{},{},{},{},{},{},{},
-//     {},{},{},{},{},{},{},{},{}
+  int puzzle2_mapData[8][9]={
+     11,3,2,0,2,3,2,2,6,
+     10,2,0,0,0,2,0,0,4,
+     0,0,0,1,0,0,0,0,4,
+     12,9,4,14,8,0,0,4,12,
+     12,10,0,0,0,0,0,5,12,
+     12,8,0,0,0,0,0,6,12,
+     8,0,0,1,0,0,0,4,12,
+     9,1,1,3,1,1,1,1,5
   };
+
+  int** puzzle2_mapInfo = (int**)malloc(8*sizeof(int*));
+  for(int i=0;i<8;i++){
+     puzzle2_mapInfo[i] = (int*)malloc(9*sizeof(int));
+     puzzle2_mapInfo[i] = puzzle2_mapData[i];
+  }
+
+  Puzzle minotaurPuzzle2(8,9,1,9,1,1,0,4,puzzle2_mapInfo);
+
+  for(int i=1;i<9;i++){
+    for(int j=1;j<10;j++)
+       printf("%d ",minotaurPuzzle2.puzzleMap[i][j]);
+    printf("\n");
+  }
+
+  printf("Puzzle2\n");
+  // print solution of puzzle1
+  minotaurPuzzle2.solvePuzzle(0,LEFT);
+  minotaurPuzzle2.printSolution();
 
 
 // ------------------------------------ puzzle 3 --------------------------------------
