@@ -124,7 +124,7 @@ class Puzzle{
     // move function of Minotaur
     void minotaurMove(){
 
-       bool isMoved=false;
+       int moveCount=0;
        prev_minotaur_row = minotaur_row;
        prev_minotaur_col = minotaur_col;
 
@@ -135,13 +135,12 @@ class Puzzle{
 	  // left direction => not blocked by wall? and this move get close to me?
 	    if(!(puzzleMap[minotaur_row][minotaur_col] & (1<<(3-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+horizon[j][0],minotaur_col+horizon[j][1]))){
-	      isMoved = true;	
+	      moveCount++;	
 	      minotaur_row += horizon[j][0],minotaur_col += horizon[j][1];
 	  } 
 
-	  if(isMoved == true){
-	     isMoved = false;
-	     continue;
+	  if(moveCount == MINOTAUR_MOVE_TIME){
+	     break;
 	  }
 
 	  // 2) second check top and bottom direction	
@@ -149,12 +148,12 @@ class Puzzle{
 	     // left direction => not blocked by wall? and this move get close to me?
 	     if(!(puzzleMap[minotaur_row][minotaur_col] & (1<<(1-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+vertical[j][0],minotaur_col+vertical[j][1]))){
-	       isMoved = true;	
+	       moveCount++;
 	       minotaur_row += vertical[j][0],minotaur_col += vertical[j][1];
 	  } 
 
 	  // if neither 1) and 2) case, then skip its turn
-	  if(isMoved == false)
+	  if(moveCount == MINOTAUR_MOVE_TIME)
 	     break;
        }
 
@@ -221,7 +220,7 @@ class Puzzle{
 
         for(int i=0;i<5;i++){
 	  
-       	  if(!(puzzleMap[my_row][my_col] & (myDir[i]!=STAY ? (1 << (3-myDir[i])) : 0))) 
+       	  if(myDir[i]==STAY || !(1 & (puzzleMap[my_row][my_col] >> (3-myDir[i])))) 
 	    solvePuzzle(moveTimes+1,myDir[i]);
 
 	  if(gameClearFlag == true) return;

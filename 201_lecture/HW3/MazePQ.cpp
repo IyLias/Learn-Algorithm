@@ -159,36 +159,35 @@ class Puzzle{
     // move function of Minotaur
     void minotaurMove(int& minotaur_row,int& minotaur_col,const int& my_row,const int& my_col){
 
-       bool isMoved=false;
+       int moveCount=0;
       
        for(int i=0;i<MINOTAUR_MOVE_TIME;i++){
  
           // 1) first check left and right direction
 	  for(int j=0;j<2;j++)
 	  // left direction => not blocked by wall? and this move get close to me?
-	    if(!(puzzleMap[minotaur_row][minotaur_col] & (1<<(3-j))) && 
+	    if(!(1 & (puzzleMap[minotaur_row][minotaur_col] >> (3-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+horizon[j][0],minotaur_col+horizon[j][1]))){
-	      isMoved = true;	
+	      moveCount++;	
 	      minotaur_row += horizon[j][0],minotaur_col += horizon[j][1];
 	  } 
 
-	  if(isMoved == true){
-	     isMoved = false;
-	     continue;
+	  if(moveCount == MINOTAUR_MOVE_TIME){
+	     break;
 	  }
 
 	  // 2) second check top and bottom direction	
-	  for(int j=0;j<2;j++)
+	  for(int j=0;j<2;j++){
 	     // left direction => not blocked by wall? and this move get close to me?
-	     if(!(puzzleMap[minotaur_row][minotaur_col] & (1<<(1-j))) && 
+	     if(!(1 & (puzzleMap[minotaur_row][minotaur_col] >> (1-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+vertical[j][0],minotaur_col+vertical[j][1]))){
-	       isMoved = true;	
+	       moveCount++;
 	       minotaur_row += vertical[j][0],minotaur_col += vertical[j][1];
-	  } 
+	     } 
+	     
+	     if(moveCount == MINOTAUR_MOVE_TIME) break;
+	  }
 
-	  // if neither 1) and 2) case, then skip its turn
-	  if(isMoved == false)
-	     break;
        }
 
 
@@ -215,7 +214,7 @@ class Puzzle{
 	 case STAY:
 	    break;
        }
-       printf("my pos %d %d\n",my_row,my_col);
+       printf("my pos %d %d direction %d\n",my_row,my_col,direction);
     }
 
     // solve puzzle function
@@ -225,30 +224,32 @@ class Puzzle{
      // printf("solve Puzzle call at my pos: (%d,%d) and direction %d\n",my_row,my_col,direction);
 
       priority_queue<Node,vector<Node>,cmp> nodeQueue;	    
+      queue<Node> qqueue;
 
       int dE = distance(start_my_row,start_my_col,exit_row,exit_col);
       int dM = distance(start_my_row,start_my_col,start_minotaur_row,start_minotaur_col);
       char sol[MAX_SOLUTION_LENGTH];
       memset(sol,0,MAX_SOLUTION_LENGTH);
       Node firstNode(start_my_row,start_my_col,start_minotaur_row,start_minotaur_col,dE,dM,sol);
-      nodeQueue.push(firstNode);      
+      //nodeQueue.push(firstNode);      
+      qqueue.push(firstNode);
 
-      while(!nodeQueue.empty()){
+      int num=15;
+
+      while(num--){
 
 	 // extract Node from nodeQueue
-	 Node targetNode = nodeQueue.top();
+	 //Node targetNode = nodeQueue.top();
+	 Node targetNode = qqueue.front();
 
          // get datas from Node 
 	 int my_row = targetNode.my_row,my_col = targetNode.my_col,minotaur_row = targetNode.minotaur_row,minotaur_col = targetNode.minotaur_col;
 	 int last_distance_to_exit = targetNode.distance_to_exit;
 	 int last_distance_to_minotaur = targetNode.distance_to_minotaur;
 
-	 printf("current Node: mypos (%d %d) minopos (%d %d)\n",my_row,my_col,minotaur_row,minotaur_col);
-
-	 char solution[MAX_SOLUTION_LENGTH];
-	 strcpy(solution,targetNode.solution);
-
-	 nodeQueue.pop();
+	 printf(">>>current Node: mypos (%d %d) minopos (%d %d)\n",my_row,my_col,minotaur_row,minotaur_col);
+	 //nodeQueue.pop();
+	 qqueue.pop();
 
 	 // check gameClear 
 	 if(isGameClear(my_row,my_col) == true){
@@ -260,21 +261,27 @@ class Puzzle{
 	 //  direction only not blocked by wall 
 	 for(int i=0;i<5;i++){
             
-	   if(!(puzzleMap[my_row][my_col] & (i!=STAY ? (1 << (3-i)) : 0))){
+	   if(!(1 & (puzzleMap[my_row][my_col] >> (3-i))) || i==STAY){
 	   // myMove() and minotaurMove() function call to change position values
-	     myMove(my_row,my_col,i);
-	     minotaurMove(minotaur_row,minotaur_col,my_row,my_col);
+	     int temp_my_row=my_row,temp_my_col=my_col,temp_minotaur_row=minotaur_row,temp_minotaur_col=minotaur_col;
+	     myMove(temp_my_row,temp_my_col,i);
+	     minotaurMove(temp_minotaur_row,temp_minotaur_col,temp_my_row,temp_my_col);
 
 	   // calculate distance between me and exit
-             int dE = distance(my_row,my_col,exit_row,exit_col);
-	     int dM = distance(my_row,my_col,minotaur_row,minotaur_col);
+             int dE = distance(temp_my_row,temp_my_col,exit_row,exit_col);
+	     int dM = distance(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col);
 
 	   // if distance is 0(caught by minotaur) then don't insert into queue 
 	   // or in STAY, distance is not changed don't insert into queue
 	     if(!(dM==0 || (i==STAY && dM == last_distance_to_minotaur))){
-	   	solution[strlen(solution)] = dir[i];
+	         char solution[MAX_SOLUTION_LENGTH];
+	         strcpy(solution,targetNode.solution);
+
+ 	         solution[strlen(solution)] = dir[i];
 	     	// insert into nodeQueue 
-		nodeQueue.push(Node(my_row,my_col,minotaur_row,minotaur_col,dE,dM,solution));
+		printf("insert Node tempmyRowPos (%d %d) tempMinoPos (%d %d)\n",temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col);
+		//nodeQueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
+		qqueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
 	     }
 	   }
 
@@ -432,5 +439,4 @@ int main(){
 
  return 0;
 }
-
 
