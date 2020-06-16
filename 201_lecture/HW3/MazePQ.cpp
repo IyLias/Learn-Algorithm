@@ -46,13 +46,15 @@ class Node{
 	distance_to_minotaur = dM;
 
 	memset(solution,0,MAX_SOLUTION_LENGTH);
-	strcpy(solution,sol);
+	for(int i=0;sol[i];i++)
+	   solution[i] = sol[i];
    }
 
    void printSolution(){
+	printf("\n\nsolution:\n");
 	for(int i=0;solution[i];i++){
 	   printf("%c",solution[i]);
-	   if(i!=0 && i%10 == 0) printf("\n");
+	   if(i!=0 && i%5 == 0) printf("\n");
 	}
 	printf("\n");
     }
@@ -225,6 +227,7 @@ class Puzzle{
 
       priority_queue<Node,vector<Node>,cmp> nodeQueue;	    
       queue<Node> qqueue;
+      vector<Node> visitedNodes;
 
       int dE = distance(start_my_row,start_my_col,exit_row,exit_col);
       int dM = distance(start_my_row,start_my_col,start_minotaur_row,start_minotaur_col);
@@ -234,9 +237,7 @@ class Puzzle{
       //nodeQueue.push(firstNode);      
       qqueue.push(firstNode);
 
-      int num=15;
-
-      while(num--){
+      while(!qqueue.empty()){
 
 	 // extract Node from nodeQueue
 	 //Node targetNode = nodeQueue.top();
@@ -247,9 +248,10 @@ class Puzzle{
 	 int last_distance_to_exit = targetNode.distance_to_exit;
 	 int last_distance_to_minotaur = targetNode.distance_to_minotaur;
 
-	 printf(">>>current Node: mypos (%d %d) minopos (%d %d)\n",my_row,my_col,minotaur_row,minotaur_col);
+	 printf(">>>current Node: mypos (%d %d) minopos (%d %d) solution: %s\n",my_row,my_col,minotaur_row,minotaur_col,targetNode.solution);
 	 //nodeQueue.pop();
 	 qqueue.pop();
+	 visitedNodes.push_back(targetNode);
 
 	 // check gameClear 
 	 if(isGameClear(my_row,my_col) == true){
@@ -273,20 +275,35 @@ class Puzzle{
 
 	   // if distance is 0(caught by minotaur) then don't insert into queue 
 	   // or in STAY, distance is not changed don't insert into queue
-	     if(!(dM==0 || (i==STAY && dM == last_distance_to_minotaur))){
-	         char solution[MAX_SOLUTION_LENGTH];
-	         strcpy(solution,targetNode.solution);
+	     if(!((dM==0 && dE != 0) || (i==STAY && dM == last_distance_to_minotaur))){
+	         bool isVisited=false;
+		 for(int k=0;k<visitedNodes.size();k++)
+		    if(visitedNodes[k].my_row==temp_my_row&&visitedNodes[k].my_col==temp_my_col&&
+			visitedNodes[k].minotaur_row==temp_minotaur_row&&visitedNodes[k].minotaur_col==temp_minotaur_col){
+			    isVisited = true;
+			    break;
+		    }
 
- 	         solution[strlen(solution)] = dir[i];
-	     	// insert into nodeQueue 
-		printf("insert Node tempmyRowPos (%d %d) tempMinoPos (%d %d)\n",temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col);
-		//nodeQueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
-		qqueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
-	     }
+		 if(isVisited == false){
+		   char solution[MAX_SOLUTION_LENGTH];
+	           memset(solution,0,MAX_SOLUTION_LENGTH);
+		   //for(int x=0;targetNode.solution[x];x++)
+		     // solution[x] = targetNode.solution[x];
+ 	           memcpy(solution,targetNode.solution,strlen(targetNode.solution));
+		   solution[strlen(targetNode.solution)] = dir[i];
+	     	   // insert into nodeQueue 
+		   printf("insert Node tempmyRowPos (%d %d) tempMinoPos (%d %d) solution: %s\n",temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,solution);
+		   //nodeQueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
+		   qqueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
+	     
+		 }
+	      }
 	   }
 
 	 }
 
+	 if(qqueue.empty())
+	    printf("*************** qqueue empty!!\n");
       }
 
     }
@@ -332,7 +349,7 @@ int main(){
 
   printf("Puzzle1\n");
   // print solution of puzzle1
-//  minotaurPuzzle1.solvePuzzle(0,RIGHT);
+  minotaurPuzzle1.solvePuzzle(0,RIGHT);
 //  minotaurPuzzle1.printSolution();
 
 
@@ -375,25 +392,24 @@ int main(){
 
 
   // puzzle3 size: 8x8
-  int puzzle3_mapData[3][3]={
-	10,3,6,
-	8,7,8,
-	9,3,5
+  int puzzle3_mapData[8][8]={
+	6,10,2,2,2,3,2,7,
+	8,0,0,0,0,2,4,14,
+	8,0,0,0,4,8,0,4,
+	8,1,0,4,8,1,0,4,
+	8,2,4,8,0,2,0,4,
+	13,12,8,0,0,4,9,4,
+	11,4,8,4,9,0,2,4,
+	11,1,1,1,7,9,1,5
   };
 
-  int** puzzle3_mapInfo = (int**)malloc(3*sizeof(int*));
-  for(int i=0;i<3;i++){
-     puzzle3_mapInfo[i] = (int*)malloc(3*sizeof(int));
+  int** puzzle3_mapInfo = (int**)malloc(8*sizeof(int*));
+  for(int i=0;i<8;i++){
+     puzzle3_mapInfo[i] = (int*)malloc(8*sizeof(int));
      puzzle3_mapInfo[i] = puzzle3_mapData[i];
   }
 
-  Puzzle minotaurPuzzle3(3,3,3,2,1,2,2,4,puzzle3_mapInfo);
-
-  for(int i=1;i<9;i++){
-    for(int j=1;j<10;j++)
-       printf("%d ",minotaurPuzzle2.puzzleMap[i][j]);
-    printf("\n");
-  }
+  Puzzle minotaurPuzzle3(8,8,2,2,1,1,1,0,puzzle3_mapInfo);
 
   printf("Puzzle3\n");
   // print solution of puzzle1
@@ -433,7 +449,7 @@ int main(){
 
 
   // puzzle5 size: 9x14
-  int puzzle5_mapInfo[9][14]={
+  int puzzle5_mapInfo[4][7]={
 
   };
 
