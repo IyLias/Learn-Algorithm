@@ -256,16 +256,16 @@ class Puzzle{
       char sol[MAX_SOLUTION_LENGTH];
       memset(sol,0,MAX_SOLUTION_LENGTH);
       Node firstNode(start_my_row,start_my_col,start_minotaur_row,start_minotaur_col,dE,dM,sol);
-      //nodeQueue.push(firstNode);      
-      qqueue.push(firstNode);
+      nodeQueue.push(firstNode);      
+      //qqueue.push(firstNode);
 
-      int num=50;
+      int num=0;
 
-      while(!qqueue.empty()){
+      while(!nodeQueue.empty()){
 
 	 // extract Node from nodeQueue
-	 //Node targetNode = nodeQueue.top();
-	 Node targetNode = qqueue.front();
+	 Node targetNode = nodeQueue.top();
+	// Node targetNode = qqueue.front();
 
          // get datas from Node 
 	 int my_row = targetNode.my_row,my_col = targetNode.my_col,minotaur_row = targetNode.minotaur_row,minotaur_col = targetNode.minotaur_col;
@@ -273,13 +273,15 @@ class Puzzle{
 	 int last_distance_to_minotaur = targetNode.distance_to_minotaur;
 
 	 printf(">>>current Node: mypos (%d %d) minopos (%d %d) solution: %s\n",my_row,my_col,minotaur_row,minotaur_col,targetNode.solution);
-	 //nodeQueue.pop();
-	 qqueue.pop();
+	 nodeQueue.pop();
+	 //qqueue.pop();
 	 visitedNodes.push_back(targetNode);
+	 num++;
 
 	 // check gameClear 
 	 if(isGameClear(my_row,my_col) == true){
 	    targetNode.printSolution();
+	    printf("\n\nTotal search Time: %d\n",num); 
 	    break;
 	 }
 
@@ -311,14 +313,12 @@ class Puzzle{
 		 if(isVisited == false){
 		   char solution[MAX_SOLUTION_LENGTH];
 	           memset(solution,0,MAX_SOLUTION_LENGTH);
-		   //for(int x=0;targetNode.solution[x];x++)
-		     // solution[x] = targetNode.solution[x];
  	           memcpy(solution,targetNode.solution,strlen(targetNode.solution));
 		   solution[strlen(targetNode.solution)] = dir[i];
 	     	   // insert into nodeQueue 
 		   printf("insert Node tempmyRowPos (%d %d) tempMinoPos (%d %d) solution: %s\n",temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,solution);
-		   //nodeQueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
-		   qqueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
+		   nodeQueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
+		   //qqueue.push(Node(temp_my_row,temp_my_col,temp_minotaur_row,temp_minotaur_col,dE,dM,solution));
 	     
 		 }
 	      }
@@ -326,7 +326,7 @@ class Puzzle{
 
 	 }
 
-	 if(qqueue.empty())
+	 if(nodeQueue.empty())
 	    printf("*************** qqueue empty!!\n");
       }
 
@@ -373,7 +373,7 @@ int main(){
 
   printf("Puzzle1\n");
   // print solution of puzzle1
-//  minotaurPuzzle1.solvePuzzle(0,RIGHT);
+ minotaurPuzzle1.solvePuzzle(0,RIGHT);
 //  minotaurPuzzle1.printSolution();
 
 
@@ -408,7 +408,7 @@ int main(){
 
   printf("Puzzle2\n");
   // print solution of puzzle1
-  minotaurPuzzle2.solvePuzzle(0,LEFT);
+//  minotaurPuzzle2.solvePuzzle(0,LEFT);
 //  minotaurPuzzle2.printSolution();
 
 
@@ -437,7 +437,7 @@ int main(){
 
   printf("Puzzle3\n");
   // print solution of puzzle1
-//  minotaurPuzzle3.solvePuzzle(0,LEFT);
+  minotaurPuzzle3.solvePuzzle(0,LEFT);
 //  minotaurPuzzle3.printSolution();
 
 
@@ -478,9 +478,30 @@ int main(){
 
 
   // puzzle5 size: 9x14
-  int puzzle5_mapInfo[4][7]={
-
+  int puzzle5_mapData[9][14]={
+     10,6,10,3,2,3,3,2,2,7,10,3,3,6,
+     12,9,1,6,12,10,3,4,8,7,12,14,14,12,
+     8,6,10,1,1,0,3,0,1,6,12,8,0,4,
+     12,8,0,2,6,12,11,0,6,8,4,12,12,12,
+     12,12,12,12,12,8,6,12,12,12,12,8,1,5,
+     8,1,1,1,4,12,8,4,12,12,12,12,14,10,
+     9,3,2,6,9,1,4,8,1,4,9,0,5,12,
+     14,14,12,12,11,3,4,8,2,1,3,1,6,12,
+      9,1,1,1,1,1,1,5,9,3,3,3,1,5	     
   };
+
+  int** puzzle5_mapInfo = (int**)malloc(9*sizeof(int*));
+  for(int i=0;i<9;i++){
+     puzzle5_mapInfo[i] = (int*)malloc(14*sizeof(int));
+     puzzle5_mapInfo[i] = puzzle5_mapData[i];
+  }
+
+  Puzzle minotaurPuzzle5(9,14,6,13,4,7,6,15,puzzle5_mapInfo);
+
+  printf("Puzzle5\n");
+  // print solution of puzzle1
+  //minotaurPuzzle5.solvePuzzle(0,BOTTOM);
+  //minotaurPuzzle5.printSolution();
 
  return 0;
 }
