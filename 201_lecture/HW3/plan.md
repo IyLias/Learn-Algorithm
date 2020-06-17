@@ -27,6 +27,8 @@ plan for HW3 in Algorithm 201 lecture
 
 - how to make backtracking of my moves not to dive in infinite loop?
 
+- 출력양식은 그냥 일자로 쭉 출력하면 되나요?(중간중간에 개행 해줄필요없이?)
+
 
 ## Move Pattern of Minotaur
 
