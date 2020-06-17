@@ -54,7 +54,7 @@ class Node{
 	printf("\n\nsolution:\n");
 	for(int i=0;solution[i];i++){
 	   printf("%c",solution[i]);
-	   if(i!=0 && i%5 == 0) printf("\n");
+	   if(i!=0 && i%5 == 0) printf("\n%d:",i/5+1);
 	}
 	printf("\n");
     }
@@ -163,21 +163,38 @@ class Puzzle{
 
        int moveCount=0;
       
-       for(int i=0;i<MINOTAUR_MOVE_TIME;i++){
+       printf("minotaurMove called start pos: (%d %d)\n",minotaur_row,minotaur_col);
+ 
+       for(int y=0;y<MINOTAUR_MOVE_TIME;y++){
+
+         for(int i=0;i<MINOTAUR_MOVE_TIME;i++){
  
           // 1) first check left and right direction
-	  for(int j=0;j<2;j++)
+	  for(int j=0;j<2;j++){
 	  // left direction => not blocked by wall? and this move get close to me?
 	    if(!(1 & (puzzleMap[minotaur_row][minotaur_col] >> (3-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+horizon[j][0],minotaur_col+horizon[j][1]))){
 	      moveCount++;	
 	      minotaur_row += horizon[j][0],minotaur_col += horizon[j][1];
-	  } 
+	  
+	      if(moveCount == MINOTAUR_MOVE_TIME) break;
+	    } 
 
-	  if(moveCount == MINOTAUR_MOVE_TIME){
-	     break;
 	  }
 
+	    if(moveCount == MINOTAUR_MOVE_TIME){
+	      break;
+	    }
+         }
+
+          printf("mino pos: ( %d %d)\n",minotaur_row,minotaur_col);
+	    if(moveCount == MINOTAUR_MOVE_TIME){
+	      return;
+	    }
+
+
+         for(int i=0;i<MINOTAUR_MOVE_TIME;i++){
+ 
 	  // 2) second check top and bottom direction	
 	  for(int j=0;j<2;j++){
 	     // left direction => not blocked by wall? and this move get close to me?
@@ -185,13 +202,18 @@ class Puzzle{
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+vertical[j][0],minotaur_col+vertical[j][1]))){
 	       moveCount++;
 	       minotaur_row += vertical[j][0],minotaur_col += vertical[j][1];
+	     	  
+	       if(moveCount == MINOTAUR_MOVE_TIME) break;
 	     } 
 	     
-	     if(moveCount == MINOTAUR_MOVE_TIME) break;
+	     printf("mino pos: (%d %d)\n",minotaur_row,minotaur_col);
 	  }
 
+	  if(moveCount == MINOTAUR_MOVE_TIME) break;
+        }
+	
+	 if(moveCount == MINOTAUR_MOVE_TIME) break;
        }
-
 
 	printf("minotaur pos after move: %d %d\n",minotaur_row,minotaur_col);
     }
@@ -236,6 +258,8 @@ class Puzzle{
       Node firstNode(start_my_row,start_my_col,start_minotaur_row,start_minotaur_col,dE,dM,sol);
       //nodeQueue.push(firstNode);      
       qqueue.push(firstNode);
+
+      int num=50;
 
       while(!qqueue.empty()){
 
@@ -349,7 +373,7 @@ int main(){
 
   printf("Puzzle1\n");
   // print solution of puzzle1
-  minotaurPuzzle1.solvePuzzle(0,RIGHT);
+//  minotaurPuzzle1.solvePuzzle(0,RIGHT);
 //  minotaurPuzzle1.printSolution();
 
 
@@ -384,7 +408,7 @@ int main(){
 
   printf("Puzzle2\n");
   // print solution of puzzle1
-//  minotaurPuzzle2.solvePuzzle(0,LEFT);
+  minotaurPuzzle2.solvePuzzle(0,LEFT);
 //  minotaurPuzzle2.printSolution();
 
 
@@ -413,7 +437,7 @@ int main(){
 
   printf("Puzzle3\n");
   // print solution of puzzle1
-  minotaurPuzzle3.solvePuzzle(0,LEFT);
+//  minotaurPuzzle3.solvePuzzle(0,LEFT);
 //  minotaurPuzzle3.printSolution();
 
 
@@ -422,24 +446,29 @@ int main(){
 
 
   // puzzle4 size: 9x14
-  int puzzle4_mapData[4][3]={
-     10,3,6,
-     8,2,0,
-     13,8,4,
-     11,1,5
+  int puzzle4_mapData[9][14]={
+     11,3,2,2,6,10,3,2,7,11,2,3,3,6,
+     14,14,12,13,12,12,11,0,3,3,5,11,3,0,
+     8,0,1,2,0,0,3,0,2,2,3,3,2,4,
+     12,12,11,4,12,8,2,4,12,9,3,3,4,12,
+     12,12,10,4,12,12,12,12,8,3,3,6,12,12,
+     12,12,12,8,4,12,8,0,0,3,3,4,12,12,
+     12,12,12,12,12,12,12,12,8,3,3,4,12,12,
+     12,12,12,12,12,12,12,12,8,3,3,4,12,12,
+      9,1,1,1,1,1,1,1,1,3,3,1,1,5	     
   };
 
-  int** puzzle4_mapInfo = (int**)malloc(4*sizeof(int*));
-  for(int i=0;i<4;i++){
-     puzzle4_mapInfo[i] = (int*)malloc(3*sizeof(int));
+  int** puzzle4_mapInfo = (int**)malloc(9*sizeof(int*));
+  for(int i=0;i<9;i++){
+     puzzle4_mapInfo[i] = (int*)malloc(14*sizeof(int));
      puzzle4_mapInfo[i] = puzzle4_mapData[i];
   }
 
-  Puzzle minotaurPuzzle4(4,3,2,2,1,2,2,4,puzzle4_mapInfo);
+  Puzzle minotaurPuzzle4(9,14,5,1,5,14,2,15,puzzle4_mapInfo);
 
   printf("Puzzle4\n");
   // print solution of puzzle1
-  minotaurPuzzle4.solvePuzzle(0,BOTTOM);
+ // minotaurPuzzle4.solvePuzzle(0,BOTTOM);
   //minotaurPuzzle4.printSolution();
 
 
