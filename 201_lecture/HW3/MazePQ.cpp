@@ -161,40 +161,34 @@ class Puzzle{
     // move function of Minotaur
     void minotaurMove(int& minotaur_row,int& minotaur_col,const int& my_row,const int& my_col){
 
-       int moveCount=0;
-      
+ 
+      int moveCount=0;
+      int horizonCount=0;
+
        printf("minotaurMove called start pos: (%d %d)\n",minotaur_row,minotaur_col);
  
        for(int y=0;y<MINOTAUR_MOVE_TIME;y++){
 
-         for(int i=0;i<MINOTAUR_MOVE_TIME;i++){
- 
           // 1) first check left and right direction
 	  for(int j=0;j<2;j++){
 	  // left direction => not blocked by wall? and this move get close to me?
 	    if(!(1 & (puzzleMap[minotaur_row][minotaur_col] >> (3-j))) && 
          (distance(my_row,my_col,minotaur_row,minotaur_col) > distance(my_row,my_col,minotaur_row+horizon[j][0],minotaur_col+horizon[j][1]))){
 	      moveCount++;	
+	      horizonCount++;
 	      minotaur_row += horizon[j][0],minotaur_col += horizon[j][1];
 	  
-	      if(moveCount == MINOTAUR_MOVE_TIME) break;
+	      if(moveCount == MINOTAUR_MOVE_TIME){
+	         printf("mino pos: ( %d %d)\n",minotaur_row,minotaur_col);
+	 	 return;
+	      } 
 	    } 
 
 	  }
 
-	    if(moveCount == MINOTAUR_MOVE_TIME){
-	      break;
-	    }
-         }
 
-          printf("mino pos: ( %d %d)\n",minotaur_row,minotaur_col);
-	    if(moveCount == MINOTAUR_MOVE_TIME){
-	      return;
-	    }
-
-
-         for(int i=0;i<MINOTAUR_MOVE_TIME;i++){
- 
+	  if(moveCount == 1 && horizonCount ==1 && y==0) continue;
+	 
 	  // 2) second check top and bottom direction	
 	  for(int j=0;j<2;j++){
 	     // left direction => not blocked by wall? and this move get close to me?
@@ -203,16 +197,17 @@ class Puzzle{
 	       moveCount++;
 	       minotaur_row += vertical[j][0],minotaur_col += vertical[j][1];
 	     	  
-	       if(moveCount == MINOTAUR_MOVE_TIME) break;
+	       if(moveCount == MINOTAUR_MOVE_TIME){
+		      
+		  printf("mino pos: ( %d %d)\n",minotaur_row,minotaur_col);
+	          return; 
+	       }
 	     } 
 	     
-	     printf("mino pos: (%d %d)\n",minotaur_row,minotaur_col);
+	    
 	  }
 
-	  if(moveCount == MINOTAUR_MOVE_TIME) break;
-        }
-	
-	 if(moveCount == MINOTAUR_MOVE_TIME) break;
+	 
        }
 
 	printf("minotaur pos after move: %d %d\n",minotaur_row,minotaur_col);
@@ -437,7 +432,7 @@ int main(){
 
   printf("Puzzle3\n");
   // print solution of puzzle1
-  minotaurPuzzle3.solvePuzzle(0,LEFT);
+  //minotaurPuzzle3.solvePuzzle(0,LEFT);
 //  minotaurPuzzle3.printSolution();
 
 
@@ -468,7 +463,7 @@ int main(){
 
   printf("Puzzle4\n");
   // print solution of puzzle1
- // minotaurPuzzle4.solvePuzzle(0,BOTTOM);
+  //minotaurPuzzle4.solvePuzzle(0,BOTTOM);
   //minotaurPuzzle4.printSolution();
 
 
@@ -500,7 +495,7 @@ int main(){
 
   printf("Puzzle5\n");
   // print solution of puzzle1
-  //minotaurPuzzle5.solvePuzzle(0,BOTTOM);
+  minotaurPuzzle5.solvePuzzle(0,BOTTOM);
   //minotaurPuzzle5.printSolution();
 
  return 0;
