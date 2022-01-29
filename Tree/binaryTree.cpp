@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <algorithm>
+#include <queue>
+
 
 using namespace std;
 
@@ -11,6 +13,31 @@ class Node{
    T value;
    Node* leftChild;
    Node* rightChild;
+
+
+   Node(T value, Node* left = NULL, Node* right= NULL){
+
+      this.value = value;
+      this.leftChild = left;
+      this.rightChild = right;
+
+   }
+
+   void add_leftChild(const Node* left){
+	this.leftChild = left;
+   }
+
+   Node* get_leftChild(){
+        return this.leftChild;
+   }
+
+   void add_rightChild(const Node* right){
+	this.rightChild = right;
+   }
+
+   Node* get_rightChild(){
+	return this.rightChild;
+   }
 
 };
 
@@ -28,6 +55,37 @@ class Tree{
 	    root->rightChild = right;
 
     }
+
+    // return depth of tree
+    int get_tree_depth(){
+
+        if(this.root == NULL)
+	  return 0;
+
+	queue<Node*> node_queue;
+	node_queue.push(this.root);
+
+	int depth = -1;
+
+	while(!(node_queue.empty())){
+
+          depth+=1;
+	  int temp_size = node_queue.size();
+	  for(int i=0;i<temp_size;i++){
+	      Node* cur_root = node_queue.pop();
+	      if(cur_root->leftChild != NULL)
+		  node_queue.push(cur_root->leftChild);
+
+	      if(cur_root->rightChild != NULL)
+		  node_queue.push(cur_root->rightChild);
+          }
+
+	}
+
+
+        return depth;
+    }
+
 
     void preorder_traversal(Node* node){
 
@@ -68,3 +126,14 @@ class Tree{
 
 
 };
+
+
+
+int main(){
+
+ 
+
+
+
+ return 0;
+}
