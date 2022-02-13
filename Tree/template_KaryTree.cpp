@@ -13,28 +13,27 @@ class Node{
  public:
   
    int value;
-   vector<Node*> childs;
-   vector<int> distance;
+   vector<pair<Node*,int>> childs;
+   
 
    Node(int value, Node* child = NULL,int dist){
 
       this->value = value;
       if(child != NULL)
-      	(this->childs).push_back(child);
-      (this->distance).push_back(dist);
+      	(this->childs).push_back(pair<Node*,int>(child,dist));
  
    }
 
-   void add_child(Node* child){
-	(this->childs).push_back(child);
+   void add_child(Node* child,int dist){
+	(this->childs).push_back(pair<Node*,int>(child,dist));
    }
 
    Node* get_child(int target){
-        return this->childs[target];
+        return this->childs[target].first;
    }
 
    int get_distance(int target){
-	return this->distance[target];
+	return this->childs[target].second;
    }
 
 };
@@ -61,9 +60,19 @@ class Tree{
 
     Node* get_child(Node* node, int value){
 
+	if(node == NULL)
+	   return NULL;
 
+	if(node->value == value)
+	   return node;
 
+	for(int child=0;child<(node->childs).size();child++){
+	   Node* result = get_child((node->childs)[child].first,value);	
+	   if(result != NULL)
+	      return result;
+	}  
 
+	return NULL;
     }
 
 
