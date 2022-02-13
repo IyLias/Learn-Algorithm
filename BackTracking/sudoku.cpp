@@ -13,10 +13,11 @@ class SudokuSolver{
 
  public: 
    
-  vector<vector<int>> sudokuMap(BOARD_SIZE,vector<int>(BOARD_SIZE));
+  vector<vector<int>> sudokuMap{BOARD_SIZE,vector<int>(BOARD_SIZE)};
 
   SudokuSolver(vector<vector<int>> map){
 
+     	  
      for(int i=0;i<BOARD_SIZE;i++)
 	 for(int j=0;j<BOARD_SIZE;j++)
 	     sudokuMap[i][j] = map[i][j];
@@ -26,7 +27,7 @@ class SudokuSolver{
   void print_sudokuMap(){
      for(int i=0;i<BOARD_SIZE;i++){
         for(int j=0;j<BOARD_SIZE;j++)
-	    printf("%d ",sudokuMap[i][j];
+	    printf("%d ",sudokuMap[i][j]);
 	printf("\n");
      }
 
